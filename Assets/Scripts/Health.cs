@@ -8,74 +8,87 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    [SerializeField] private int _maxValue;
-    [SerializeReference] private IHealthDrawer _drawer;
+    [SerializeField] private int _maxValue = 100;
 
-    private int _value;
-    private int _previosValue;
+    [SerializeField] private GameObject _HealthDrawer;
 
-    public event Action ValueChanged;
+    //[SerializeField] private HealthDrawerInterface _HealthDrawer;
 
-    public int Value
+
+    private IHealthDrawer _drawer;
+
+    //private int _value;
+    //private int _previosValue;
+
+    public event Action<int> HealthChanged;
+
+    public int Value { get; set; }
+    public int MaxValue { get { return _maxValue; } set { _maxValue = value; } }
+    public int PreviousValue { get; private set; }
+
+    private void OnEnable()
     {
-        get { return _value; }
 
-        set { _value = GetPositive(value); }
+
+        _drawer = _HealthDrawer.GetComponent<IHealthDrawer>();
+        HealthChanged += _drawer.OnHealthChanged;
+
+        //HealthChanged += _HealthDrawer.Implmentation.OnHealthChanged;
+
+        //HealthChanged += _HealthDrawer.Implmentation.OnHealthChanged;
+
+         //HealthChanged += _HealthDrawer._implmentation.OnHealthChanged;
+
+
+        Value = MaxValue;
+
     }
 
-    public int MaxValue
+    public void Add(int addingValue)
     {
-        get { return _maxValue; }
+        ThrowExecptionOnNegative(addingValue);
 
-        set { _value = GetPositive(value); }
-    }
-
-    public int PreviosValue
-    {
-        get { return _previosValue; }
-
-        private set { _value = GetPositive(value); }
-    }
-
-    public void Add(int value)
-    {
-        if (Value == MaxValue || value <= 0)
+        if (Value == MaxValue || addingValue == 0)
         {
             return;
         }
 
-        SetValue(Value + value);
+        SetValue(Value + addingValue);
     }
 
-    public void Reduce(int value)
+    public void Reduce(int reducingValue)
     {
-        if (Value == 0 || value <= 0)
+        ThrowExecptionOnNegative(reducingValue);
+
+        if (Value == 0 || reducingValue == 0)
         {
             return;
         }
 
-        SetValue(Value - value);
+        SetValue(Value - reducingValue);
     }
 
-    private static int GetPositive(int value)
+    //public void Reduce10()
+    //{
+    //    Debug.Log(Value);
+    //    SetValue(Value - 10);
+    //}
+
+    private static void ThrowExecptionOnNegative(int value)
     {
         if (value < 0)
-        {
             throw new Exception("Value can't be negative");
-        }
-
-        return value;
     }
 
-    private void SetValue(int value)
+    private void SetValue(int newValue)
     {
-        PreviosValue = Value;
-        Value = value;
+        PreviousValue = Value;
+        Value = newValue;
         Value = Mathf.Clamp(Value, 0, MaxValue);
 
-        if (PreviosValue != Value)
+        if (PreviousValue != Value)
         {
-            ValueChanged?.Invoke();
+            HealthChanged?.Invoke(Value);
         }
     }
 }

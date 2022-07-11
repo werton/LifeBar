@@ -581,7 +581,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1328869728}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ValueBar, Assembly-CSharp
         m_MethodName: IncreaseValue
         m_Mode: 3
@@ -690,7 +690,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1317261325}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -797,7 +797,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1328869725}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 677c58fad5ae26243982e71b8d284629, type: 3}
+  m_Script: {fileID: 11500000, guid: 6d812820b59b3b64abf0a0c8db33be3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1523876530
@@ -829,7 +829,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5aed174b8a15df43920c4ae6219f50f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxValue: 0
+  _maxValue: 100
+  _HealthDrawer: {fileID: 0}
 --- !u!4 &1523876532
 Transform:
   m_ObjectHideFlags: 0
@@ -1002,14 +1003,14 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1328869728}
-        m_TargetAssemblyTypeName: ValueBar, Assembly-CSharp
-        m_MethodName: DecreaseValue
+      - m_Target: {fileID: 1523876531}
+        m_TargetAssemblyTypeName: Health, Assembly-CSharp
+        m_MethodName: Reduce
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 15
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0

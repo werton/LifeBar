@@ -1,18 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class HealthDrawer : MonoBehaviour, IHealthDrawer
+[RequireComponent(typeof(Slider))]
+public class HealthBar : MonoBehaviour, IHealthDrawer
 {
-    // Start is called before the first frame update
-    void Start()
+    private Slider _slider;
+
+    void Awake()
     {
-        
+        _slider = GetComponent<Slider>(); 
     }
 
-    // Update is called once per frame
     void Update()
     {
         
     }
+
+    public void OnHealthChanged(int healthValue)
+    {
+        Debug.Log("OnHealthChanged called");
+        Debug.Log(healthValue);
+    }
+
 }
