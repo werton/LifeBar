@@ -10,15 +10,9 @@ public class Health : MonoBehaviour
 {
     [SerializeField] private int _maxValue = 100;
 
-    [SerializeField] private GameObject _HealthDrawer;
-
-    //[SerializeField] private HealthDrawerInterface _HealthDrawer;
-
+    //[SerializeField] private GameObject _HealthDrawer;
 
     private IHealthDrawer _drawer;
-
-    //private int _value;
-    //private int _previosValue;
 
     public event Action<int> HealthChanged;
 
@@ -26,22 +20,27 @@ public class Health : MonoBehaviour
     public int MaxValue { get { return _maxValue; } set { _maxValue = value; } }
     public int PreviousValue { get; private set; }
 
+    [SerializeField]
+    private MonoBehaviour  _HealthDrawer;
+    private IHealthDrawer HealthDrawerInterface => (IHealthDrawer) _HealthDrawer;
+
+    private void OnValidate()
+    {
+        if (_HealthDrawer is IHealthDrawer)
+            return;
+
+        Debug.LogError(_HealthDrawer.name + " needs to implement " + nameof(IHealthDrawer));
+        _HealthDrawer = null;
+    }
+
     private void OnEnable()
     {
-
-
-        _drawer = _HealthDrawer.GetComponent<IHealthDrawer>();
-        HealthChanged += _drawer.OnHealthChanged;
-
-        //HealthChanged += _HealthDrawer.Implmentation.OnHealthChanged;
-
-        //HealthChanged += _HealthDrawer.Implmentation.OnHealthChanged;
-
-         //HealthChanged += _HealthDrawer._implmentation.OnHealthChanged;
-
+        if (_HealthDrawer.TryGetComponent<IHealthDrawer>(out _drawer))
+        {
+            HealthChanged += _drawer.OnHealthChanged;
+        }
 
         Value = MaxValue;
-
     }
 
     public void Add(int addingValue)
