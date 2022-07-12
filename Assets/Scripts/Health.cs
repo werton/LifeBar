@@ -9,20 +9,23 @@ public class Health : MonoBehaviour
 
     public float Value { get; set; }
     public float MaxValue
-    { get { return _maxValue; } set { _maxValue = value; } }
+    {
+        get { return _maxValue; }
+        set { _maxValue = value; }
+    }
     public float PreviousValue { get; private set; }
 
     [SerializeField]
     private MonoBehaviour _healthDrawer;
 
-    private IHealthDrawer HealthDrawer => (IHealthDrawer)_healthDrawer;
+    private IValueDrawer HealthDrawer => (IValueDrawer)_healthDrawer;
 
     private void OnValidate()
     {
-        if (_healthDrawer is IHealthDrawer)
+        if (_healthDrawer is IValueDrawer)
             return;
 
-        Debug.LogError(_healthDrawer.name + " needs to implement " + nameof(IHealthDrawer));
+        Debug.LogError(_healthDrawer.name + " needs to implement " + nameof(IValueDrawer));
         _healthDrawer = null;
     }
 
@@ -30,18 +33,18 @@ public class Health : MonoBehaviour
     {
         Value = MaxValue;
 
-        HealthChanged += HealthDrawer.OnHealthChanged;
+        HealthChanged += HealthDrawer.OnValueChanged;
+
         HealthDrawer.SetValueNow(Value, MaxValue);
     }
 
     private void OnDisable()
     {
-        HealthChanged -= HealthDrawer.OnHealthChanged;
+        HealthChanged -= HealthDrawer.OnValueChanged;
     }
 
     public void Add(int addingValue)
     {
-        Debug.Log("add");
         ThrowExecptionOnNegative(addingValue);
 
         if (Value == MaxValue || addingValue == 0)
@@ -49,10 +52,7 @@ public class Health : MonoBehaviour
             return;
         }
 
-        Debug.Log(addingValue);
-
         SetValue(Value + addingValue);
-        Debug.Log(Value);
     }
 
     public void Reduce(int reducingValue)
