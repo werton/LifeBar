@@ -64,7 +64,6 @@ public class ValueBar : MonoBehaviour, IValueDrawer
             yield return null;
         }
 
-        _valueStepChanger = null;
         yield break;
     }
 
@@ -73,9 +72,6 @@ public class ValueBar : MonoBehaviour, IValueDrawer
         if (_valueStepChanger != null)
         {
             StopCoroutine(_valueStepChanger);
-            _valueStepChanger = null;
-
-            _sliderTargetValue = _slider.value;
         }
     }
 

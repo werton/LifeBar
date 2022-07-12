@@ -11,12 +11,12 @@ public class Health : MonoBehaviour
 
     public event Action<float, float> HealthChanged;
 
-    public float Value { get; set; }
+    public float Value { get; private set; }
 
     public float MaxValue
     {
         get { return _maxValue; }
-        set { _maxValue = value; }
+        private set { _maxValue = value; }
     }
 
     public float PreviousValue { get; private set; }
