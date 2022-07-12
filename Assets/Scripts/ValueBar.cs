@@ -4,20 +4,45 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Slider))]
-public class ValueBar : MonoBehaviour, IValueDrawer
+public class ValueBar : MonoBehaviour
 {
     [SerializeField]
     private float _sliderSpeed = 30f;
+
+    [SerializeField]
+    private MonoBehaviour _drawableValue;
 
     private Slider _slider;
     private float _clientTargetValue;
     private float _clientMaxValue;
     private float _sliderTargetValue;
     private Coroutine _valueStepChanger;
+    private IDrawableValue DrawableValue => (IDrawableValue)_drawableValue;
+
+    private void OnValidate()
+    {
+        if (_drawableValue is IDrawableValue)
+        {
+            return;
+        }
+
+        Debug.LogError(_drawableValue.name + " needs to implement " + nameof(IDrawableValue));
+        _drawableValue = null;
+    }
 
     private void Awake()
     {
         _slider = GetComponent<Slider>();
+    }
+
+    private void OnEnable ()
+    {
+        DrawableValue.ValueChanged += OnValueChanged;
+    }
+
+    private void OnDisable()
+    {
+        DrawableValue.ValueChanged -= OnValueChanged;
     }
 
     public void OnValueChanged(float clientTargetValue, float clientMaxValue)
@@ -34,13 +59,6 @@ public class ValueBar : MonoBehaviour, IValueDrawer
 
             _valueStepChanger = StartCoroutine(SetSliderValueByStep());
         }
-    }
-
-    public void SetValueNow(float clientValue, float clientMaxValue)
-    {
-        ThrowExeptionOnIncorrectValue(clientValue, clientMaxValue);
-        StopValueStepChanger();
-        _slider.value = ConvertClientValueToSlider(clientValue, clientMaxValue);
     }
 
     private void ThrowExeptionOnIncorrectValue(float clientValue, float clientMaxValue)

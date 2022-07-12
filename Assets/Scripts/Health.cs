@@ -1,15 +1,12 @@
 using System;
 using UnityEngine;
 
-public class Health : MonoBehaviour
+public class Health : MonoBehaviour, IDrawableValue
 {
     [SerializeField]
     private float _maxValue = 100f;
 
-    [SerializeField]
-    private MonoBehaviour _healthDrawer;
-
-    public event Action<float, float> HealthChanged;
+    public event Action<float, float> ValueChanged;
 
     public float Value { get; private set; }
 
@@ -21,31 +18,9 @@ public class Health : MonoBehaviour
 
     public float PreviousValue { get; private set; }
 
-    private IValueDrawer HealthDrawer => (IValueDrawer)_healthDrawer;
-
-    private void OnValidate()
+    private void Start()
     {
-        if (_healthDrawer is IValueDrawer)
-        {
-            return;
-        }
-
-        Debug.LogError(_healthDrawer.name + " needs to implement " + nameof(IValueDrawer));
-        _healthDrawer = null;
-    }
-
-    private void OnEnable()
-    {
-        Value = MaxValue;
-
-        HealthChanged += HealthDrawer.OnValueChanged;
-
-        HealthDrawer.SetValueNow(Value, MaxValue);
-    }
-
-    private void OnDisable()
-    {
-        HealthChanged -= HealthDrawer.OnValueChanged;
+        SetValue(MaxValue);
     }
 
     public void Add(int addingValue)
@@ -88,7 +63,7 @@ public class Health : MonoBehaviour
 
         if (PreviousValue != Value)
         {
-            HealthChanged?.Invoke(Value, MaxValue);
+            ValueChanged?.Invoke(Value, MaxValue);
         }
     }
 }
