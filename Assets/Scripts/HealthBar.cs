@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,52 +8,59 @@ public class HealthBar : MonoBehaviour, IHealthDrawer
 {
     private Slider _slider;
 
-    void Awake()
+    [SerializeField] private Color _lowHpColor;
+    [SerializeField] private Color _highHpColor;
+    [SerializeField] private Image _image;
+
+    [SerializeField] private float _flowSpeed = 20f;
+
+    private float _sliderDefaultValue = 50;
+
+    protected void Awake()
     {
-        _slider = GetComponent<Slider>(); 
+        _slider = GetComponent<Slider>();
+        _slider.value = _sliderDefaultValue;
     }
 
-    void Update()
+    public void OnHealthChanged(float health, float maxHealth)
     {
-        
+        StartCoroutine(SetSliderValueByStep(health, maxHealth));
     }
 
-    public void OnHealthChanged(int healthValue)
+    public void SetValueNow(float health, float maxHealth)
     {
-        Debug.Log("OnHealthChanged called");
-        Debug.Log(healthValue);
-        //StartCoroutine(SetHealthValue(healthValue));
+        SetSliderValue(health, maxHealth);
     }
 
+    private IEnumerator SetSliderValueByStep(float sliderNewValue, float maxValue)
+    {
+        while (_slider.value != sliderNewValue)
+        {
+            SetSliderValue(Mathf.MoveTowards(_slider.value, sliderNewValue, _flowSpeed * Time.deltaTime), maxValue);
+            yield return null;
+        }
 
-    //[SerializeField] private Player _player;
-    //[SerializeField] private Color _lowHpColor;
-    //[SerializeField] private Color _highHpColor;
-    //[SerializeField] private Image _image;
+        yield break;
+    }
 
-    //private float _sliderSpeed = 7f;
-    //private float _sliderDefaultValue = 50.0f;
+    private void SetSliderValue(float value, float maxValue)
+    {
+        _slider.value = _slider.maxValue * GetValueRatio(value, maxValue);
+    }
 
-    //private void Start()
-    //{
-    //    _slider = GetComponent<Slider>();
-    //    _slider.value = _sliderDefaultValue;
-    //}
+    private float GetValueRatio(float value, float maxValue)
+    {
+        if (value > maxValue)
+            throw new Exception("value can't be greater than maxValue");
 
+        if (value < 0 || maxValue < 0)
+            throw new Exception("value, maxValue can't be negative");
 
-    //private IEnumerator SetHealthValue(int healthValue)
-    //{
-    //    while (_slider.value != _player.Health)
-    //    {
-    //        _slider.value = Mathf.MoveTowards(_slider.value, _player.Health, _sliderSpeed * Time.deltaTime);
-    //        yield return null;
-    //    }
-    //    yield break;
-    //}
+        return value / maxValue;
+    }
 
-    //public void ChangeSliderColor()
-    //{
-    //    _image.color = Color.Lerp(_lowHpColor, _highHpColor, _slider.value / 100);
-    //}
-
+    public void ChangeSliderColor()
+    {
+        _image.color = Color.Lerp(_lowHpColor, _highHpColor, _slider.value / 100);
+    }
 }

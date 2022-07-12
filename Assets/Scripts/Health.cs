@@ -1,50 +1,47 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
-//[Serializable]
-
 
 public class Health : MonoBehaviour
 {
-    [SerializeField] private int _maxValue = 100;
+    [SerializeField] private float _maxValue = 100f;
 
-    //[SerializeField] private GameObject _HealthDrawer;
+    public event Action<float, float> HealthChanged;
 
-    private IHealthDrawer _drawer;
-
-    public event Action<int> HealthChanged;
-
-    public int Value { get; set; }
-    public int MaxValue { get { return _maxValue; } set { _maxValue = value; } }
-    public int PreviousValue { get; private set; }
+    public float Value { get; set; }
+    public float MaxValue
+    { get { return _maxValue; } set { _maxValue = value; } }
+    public float PreviousValue { get; private set; }
 
     [SerializeField]
-    private MonoBehaviour  _HealthDrawer;
-    private IHealthDrawer HealthDrawerInterface => (IHealthDrawer) _HealthDrawer;
+    private MonoBehaviour _healthDrawer;
+
+    private IHealthDrawer HealthDrawer => (IHealthDrawer)_healthDrawer;
 
     private void OnValidate()
     {
-        if (_HealthDrawer is IHealthDrawer)
+        if (_healthDrawer is IHealthDrawer)
             return;
 
-        Debug.LogError(_HealthDrawer.name + " needs to implement " + nameof(IHealthDrawer));
-        _HealthDrawer = null;
+        Debug.LogError(_healthDrawer.name + " needs to implement " + nameof(IHealthDrawer));
+        _healthDrawer = null;
     }
 
     private void OnEnable()
     {
-        if (_HealthDrawer.TryGetComponent<IHealthDrawer>(out _drawer))
-        {
-            HealthChanged += _drawer.OnHealthChanged;
-        }
-
         Value = MaxValue;
+
+        HealthChanged += HealthDrawer.OnHealthChanged;
+        HealthDrawer.SetValueNow(Value, MaxValue);
+    }
+
+    private void OnDisable()
+    {
+        HealthChanged -= HealthDrawer.OnHealthChanged;
     }
 
     public void Add(int addingValue)
     {
+        Debug.Log("add");
         ThrowExecptionOnNegative(addingValue);
 
         if (Value == MaxValue || addingValue == 0)
@@ -52,7 +49,10 @@ public class Health : MonoBehaviour
             return;
         }
 
+        Debug.Log(addingValue);
+
         SetValue(Value + addingValue);
+        Debug.Log(Value);
     }
 
     public void Reduce(int reducingValue)
@@ -67,19 +67,13 @@ public class Health : MonoBehaviour
         SetValue(Value - reducingValue);
     }
 
-    //public void Reduce10()
-    //{
-    //    Debug.Log(Value);
-    //    SetValue(Value - 10);
-    //}
-
     private static void ThrowExecptionOnNegative(int value)
     {
         if (value < 0)
             throw new Exception("Value can't be negative");
     }
 
-    private void SetValue(int newValue)
+    private void SetValue(float newValue)
     {
         PreviousValue = Value;
         Value = newValue;
@@ -87,7 +81,7 @@ public class Health : MonoBehaviour
 
         if (PreviousValue != Value)
         {
-            HealthChanged?.Invoke(Value);
+            HealthChanged?.Invoke(Value, MaxValue);
         }
     }
 }
