@@ -3,27 +3,32 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    [SerializeField] private float _maxValue = 100f;
+    [SerializeField]
+    private float _maxValue = 100f;
+
+    [SerializeField]
+    private MonoBehaviour _healthDrawer;
 
     public event Action<float, float> HealthChanged;
 
     public float Value { get; set; }
+
     public float MaxValue
     {
         get { return _maxValue; }
         set { _maxValue = value; }
     }
-    public float PreviousValue { get; private set; }
 
-    [SerializeField]
-    private MonoBehaviour _healthDrawer;
+    public float PreviousValue { get; private set; }
 
     private IValueDrawer HealthDrawer => (IValueDrawer)_healthDrawer;
 
     private void OnValidate()
     {
         if (_healthDrawer is IValueDrawer)
+        {
             return;
+        }
 
         Debug.LogError(_healthDrawer.name + " needs to implement " + nameof(IValueDrawer));
         _healthDrawer = null;
@@ -70,7 +75,9 @@ public class Health : MonoBehaviour
     private static void ThrowExecptionOnNegative(int value)
     {
         if (value < 0)
+        {
             throw new Exception("Value can't be negative");
+        }
     }
 
     private void SetValue(float newValue)
